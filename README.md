@@ -1,13 +1,21 @@
-# ICS Studio
+# ICS Studio 1.1
 
 Minimalistinis LT / EN kalendoriaus įvykių (.ics) generatorius, paruoštas GitHub Pages.
+
+## Paleidimas
+
+Atidarykite `index.html` naršyklėje arba publikuokite šio aplanko turinį per GitHub Pages:
+**Settings → Pages → Deploy from a branch → main → /(root) → Save**.
+
+Nereikia Node.js, npm, API raktų, serverio ar išorinių bibliotekų. Visi keliai santykiniai, todėl veikia ir repozitorijos poaplankyje.
 
 ## Galimybės
 
 - LT / EN kalbos perjungimas, tamsi tema, oranžinis akcentas.
 - Pavadinimas, aprašymas, vieta, nuoroda, datos, laikas ir visos dienos įvykiai.
 - 10 laiko juostų, numatytoji Europe/Vilnius.
-- Pagrindinis priminimas ir papildomi priminimai Advanced režime.
+- Keli priminimai pagrindinėje formoje su minučių, valandų ir dienų pasirinkimu.
+- Susieta pradžia, trukmė ir pabaiga; rankinis pabaigos koregavimas.
 - Kasdienis, savaitinis, mėnesinis ar metinis kartojimas; intervalas, savaitės dienos, kartų skaičius arba pabaigos data.
 - Organizatoriaus ir dalyvių el. paštai, privatumas, užimtumas, būsena.
 - Vietinė peržiūra ir failo atsisiuntimas. Kvietimai el. paštu nesiunčiami.
@@ -23,6 +31,7 @@ Forma nesiunčia įvestų duomenų į serverį ir neišsaugo įvykių po puslapi
 | index.html | Formos struktūra |
 | styles.css | Tema ir prisitaikymas ekranams |
 | app.js | Kalbos, peržiūra ir atsisiuntimas |
+| time.js | Trukmės ir laiko skaičiavimas |
 | calendar.js | iCalendar serializavimas ir laiko juostos |
 | favicon.svg | Svetainės piktograma |
 | .nojekyll | Tiesioginis statinių failų publikavimas |
@@ -41,7 +50,7 @@ Kiekvienas atsisiuntimas sukuria naują UID ir naują įvykį. Pakartotinis impo
 Turint Node.js 20 ar naujesnį:
 
 ```bash
-node --test tests/calendar.test.cjs
+node --test tests/*.test.cjs
 ```
 
 Testų paleidimas nereikalingas svetainei naudoti ar publikuoti.
@@ -53,7 +62,7 @@ Testų paleidimas nereikalingas svetainei naudoti ar publikuoti.
 
 ## Atlikta patikra
 
-- 11 automatinių generatoriaus testų — sėkmingi.
+- 19 automatinių generatoriaus ir laiko testų — sėkmingi.
 - Visų 9 sezoninių laiko juostų VTIMEZONE aprašai patikrinti nepriklausomu Python dateutil skaitytuvu prieš sistemos tzdata.
 - Patikrinta JavaScript sintaksė, HTML identifikatoriai, laukų etiketės ir nuorodos į vietinius failus.
 - Vaizdinė ir sąveikos patikra tikroje naršyklėje šioje rengimo aplinkoje neatlikta: nepavyko atsisiųsti Chromium. Faktinis importas į Google Calendar, Outlook ar Apple Calendar nebuvo tikrintas. Po publikavimo išbandykite savo naršyklėje ir kalendoriuje.

@@ -34,7 +34,7 @@ function build(e){
  if(e.allDay){if(e.endDate<e.startDate)throw Error('end');start=e.startDate;end=dayAfter(e.endDate);}
  else{start=toUTC(e.startDate+'T'+e.startTime,e.zone);end=toUTC(e.endDate+'T'+e.endTime,e.zone);if(end<=start)throw Error('end');}
  const advanced=e.advanced;const repeating=advanced&&e.frequency;
- const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ICS Studio//Calendar Generator 1.0//EN','CALSCALE:GREGORIAN'];
+ const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ICS Studio//Calendar Generator 1.1//EN','CALSCALE:GREGORIAN'];
  if(!e.allDay&&repeating)lines.push(...timezone(e.zone));
  lines.push('BEGIN:VEVENT','UID:'+(e.uid||crypto.randomUUID()+'@ics-studio'),'DTSTAMP:'+stamp(e.now||new Date()),'SUMMARY:'+escapeText(e.title.trim()));
  if(e.allDay)lines.push('DTSTART;VALUE=DATE:'+compact(start),'DTEND;VALUE=DATE:'+compact(end));
@@ -58,7 +58,7 @@ function build(e){
   if(['OPAQUE','TRANSPARENT'].includes(e.busy))lines.push('TRANSP:'+e.busy);
   if(['CONFIRMED','TENTATIVE','CANCELLED'].includes(e.status))lines.push('STATUS:'+e.status);
  }
- const alarms=[e.reminder,...(advanced?(e.extraReminders||[]):[])].filter(x=>x!==''&&x!==undefined&&x!==null);
+ const alarms=(Array.isArray(e.reminders)?e.reminders:[e.reminder,...(advanced?(e.extraReminders||[]):[])]).filter(x=>x!==''&&x!==undefined&&x!==null);
  for(const m of new Set(alarms.map(Number))){if(!Number.isInteger(m)||m<0||m>40320)throw Error('alarm');lines.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+escapeText(e.title.trim()),'TRIGGER:'+(m===0?'PT0S':`-PT${m}M`),'END:VALARM');}
  lines.push('END:VEVENT','END:VCALENDAR');return lines.map(fold).join('\r\n')+'\r\n';
 }
