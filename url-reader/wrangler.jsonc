@@ -1,0 +1,11 @@
+{
+  "name": "ics-studio-url-reader",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-21",
+  "vars": {
+    "ALLOWED_ORIGINS": "https://79mas.github.io",
+    "ALLOWED_HOSTS": ""
+  },
+  "ratelimits": [{"name":"RATE_LIMITER","namespace_id":"1001","simple":{"limit":10,"period":60}}],
+  "observability": {"enabled": false}
+}

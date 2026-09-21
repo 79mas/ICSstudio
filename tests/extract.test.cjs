@@ -1,0 +1,7 @@
+const {test}=require('node:test');const a=require('node:assert/strict');const X=require('../extract.js');
+test('LT date/time duration and location',()=>{const r=X.extract('Renginys: Susitikimas\n2026-09-25 18:00–19:30\nVieta: Vilnius\nTrukmė: 1,5 valandos');a.equal(r.fields.startDate,'2026-09-25');a.equal(r.fields.endTime,'19:30');a.equal(r.fields.durationMinutes,90);a.equal(r.fields.location,'Vilnius');});
+test('registration date excluded, event retained',()=>{const r=X.extract('Renginys: Testas\n2026-09-25 18:00; registracija iki 2026-09-22');a.equal(r.fields.startDate,'2026-09-25');});
+test('ambiguous and missing fields visible',()=>{const r=X.extract('Test\n09/10/2026');a.ok(r.warnings.includes('ambiguousDate'));a.ok(r.warnings.includes('timeMissing'));a.equal(X.extract('No dates').fields.startDate,undefined);});
+test('multiple dates not silently selected',()=>{const r=X.extract('2026-09-25 arba 2026-09-26');a.equal(r.candidates.length,2);a.equal(r.fields.startDate,undefined);});
+test('structured events, HTML scripts stripped, offset warned',()=>{const h=X.htmlText('<script type="application/ld+json">{"@type":"Event","name":"Test","startDate":"2026-09-25T18:00:00+03:00"}</script><p>Hello</p><script>alert(1)</script>');const r=X.structured(h.json)[0];a.equal(r.fields.title,'Test');a.ok(r.warnings.includes('offsetVerify'));a.equal(h.text,'Hello');});
+test('offset is not an end time',()=>{a.equal(X.extract('2026-09-25T18:00:00+03:00').fields.endTime,undefined);});

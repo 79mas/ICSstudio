@@ -1,0 +1,9 @@
+(function(root){'use strict';
+const loaded=new Map();function script(src,global){if(root[global])return Promise.resolve(root[global]);if(!loaded.has(src))loaded.set(src,new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=()=>resolve(root[global]);s.onerror=()=>{loaded.delete(src);s.remove();reject(Error('dependency'));};document.head.append(s);}));return loaded.get(src);}
+async function read(file){if(!file||file.size>(ICS_CONFIG.maxFileBytes||10485760))throw Error('large');const ext=file.name.split('.').pop().toLowerCase();let text='',json=[];
+if(['txt','md','csv','html','htm','json'].includes(ext)){const raw=await file.text();if(['html','htm'].includes(ext))({text,json}=Extractor.htmlText(raw));else if(ext==='json'){json=[JSON.parse(raw)];text=raw;}else text=raw;}
+else if(ext==='docx'){const mammoth=await script('https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js','mammoth');text=(await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()})).value;}
+else if(ext==='pdf'){const pdfjs=await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs');pdfjs.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';const pdf=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()),isEvalSupported:false}).promise;try{if(pdf.numPages>(ICS_CONFIG.maxPdfPages||50))throw Error('pages');for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i),content=await page.getTextContent();text+=content.items.map(x=>x.str+(x.hasEOL?'\n':' ')).join('')+'\n';if(text.length>250000)throw Error('large');}}finally{await pdf.destroy();}if(text.trim().length<10)throw Error('scan');}
+else throw Error('fileType');if(text.length>250000)throw Error('large');return {text,json};}
+root.SourceFiles={read};
+})(window);
